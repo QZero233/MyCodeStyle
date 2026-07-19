@@ -8,7 +8,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-orange.svg)](./SKILL.md)
 [![Codex](https://img.shields.io/badge/Codex-Skill-blue.svg)](./SKILL.md)
 
-`代码风格规范` · `Git 提交规范` · `注释规范` · `接口设计规范` · `Kotlin/Java 规范`
+`代码风格规范` · `Git 提交规范` · `注释规范` · `接口设计规范` · `经验积累`
 
 [规则来源](#规则来源) · [安装](#安装) · [规范概览](#规范概览) · [目录结构](#目录结构)
 
@@ -67,7 +67,7 @@ git clone git@github.com:QZero233/MyCodeStyle.git ~/.codex/skills/qzero-code-sty
 
 ```text
 qzero-code-style/
-├── SKILL.md        # Skill 定义文件
+├── SKILL.md        # Skill 定义文件（规范引用 + 经验积累流程）
 ├── CLAUDE.md       # 项目级指令
 ├── CODE_STYLE.md   # 代码风格规范
 ├── GIT_STYLE.md    # Git 提交规范
@@ -127,7 +127,7 @@ qzero-code-style/
 
 ```text
 qzero-code-style/
-├── SKILL.md        # Skill 定义文件（引用各规范文档）
+├── SKILL.md        # Skill 定义文件（规范引用 + 经验积累流程）
 ├── CLAUDE.md       # 项目级指令
 ├── CODE_STYLE.md   # 代码风格规范（20 条规则）
 ├── GIT_STYLE.md    # Git 提交规范
