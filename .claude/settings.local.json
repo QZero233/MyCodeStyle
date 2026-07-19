@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Read(//Users/qzero/.claude/skills/**)",
+      "Read(//Users/qzero/.codex/**)",
+      "Read(//Users/qzero/.codex/skills/**)",
+      "Bash(ln -s /Users/qzero/playground/codex/code_style ~/.claude/skills/我的编码风格)",
+      "Bash(ln -s /Users/qzero/playground/codex/code_style ~/.codex/skills/我的编码风格)"
+    ]
+  }
+}
