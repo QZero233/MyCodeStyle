@@ -1,5 +1,5 @@
 ---
-name: 我的编码风格
+name: qzero-code-style
 description: 写代码和做 Git 提交时必须遵循本仓库中的规范文档。
 ---
 
