@@ -32,16 +32,22 @@
 
 ```bash
 # 1. 克隆本仓库
-git clone git@github.com:QZero233/MyCodeStyle.git ~/playground/codex/code_style
+git clone git@github.com:QZero233/MyCodeStyle.git
 
-# 2. 为 Claude Code 创建软链接
-ln -s ~/playground/codex/code_style ~/.claude/skills/qzero-code-style
+# 2. 为 Claude Code 创建软链接（将 <repo-path> 替换为克隆后的实际目录路径）
+ln -s <repo-path> ~/.claude/skills/qzero-code-style
 
 # 3. 为 Codex 创建软链接
-ln -s ~/playground/codex/code_style ~/.codex/skills/qzero-code-style
+ln -s <repo-path> ~/.codex/skills/qzero-code-style
 ```
 
-### 方法二：直接克隆到 skills 目录
+### 方法二：通过 npx 一键安装
+
+```bash
+npx skills add https://github.com/QZero233/MyCodeStyle.git
+```
+
+### 方法三：直接克隆到 skills 目录
 
 ```bash
 # Claude Code
@@ -51,7 +57,7 @@ git clone git@github.com:QZero233/MyCodeStyle.git ~/.claude/skills/qzero-code-st
 git clone git@github.com:QZero233/MyCodeStyle.git ~/.codex/skills/qzero-code-style
 ```
 
-### 方法三：手动安装
+### 方法四：手动安装
 
 1. 下载或克隆本仓库到本地任意路径
 2. 将仓库目录通过软链接或直接复制放置到对应工具的 skills 目录：
@@ -60,8 +66,9 @@ git clone git@github.com:QZero233/MyCodeStyle.git ~/.codex/skills/qzero-code-sty
 3. 确保目录结构如下：
 
 ```text
-~/.claude/skills/qzero-code-style/
+qzero-code-style/
 ├── SKILL.md        # Skill 定义文件
+├── CLAUDE.md       # 项目级指令
 ├── CODE_STYLE.md   # 代码风格规范
 ├── GIT_STYLE.md    # Git 提交规范
 ├── README.md       # 本说明文档
@@ -121,21 +128,12 @@ git clone git@github.com:QZero233/MyCodeStyle.git ~/.codex/skills/qzero-code-sty
 ```text
 qzero-code-style/
 ├── SKILL.md        # Skill 定义文件（引用各规范文档）
+├── CLAUDE.md       # 项目级指令
 ├── CODE_STYLE.md   # 代码风格规范（20 条规则）
 ├── GIT_STYLE.md    # Git 提交规范
 ├── README.md       # 本说明文档
 └── LICENSE         # MIT 许可证
 ```
-
----
-
-## 设计思路
-
-这个 Skill 的核心假设是：AI 在写代码时最需要的不是"自由度"，而是"约束"。在没有明确规范指引的情况下，AI 倾向于过度工程化——创建不必要的抽象层、编写防御性的空值检查、为未来可能存在的需求预留接口、将代码拆分进一堆 utils/helper/common 文件。这些做法在表面上看是"最佳实践"，但实际会显著降低代码的可读性和可维护性，尤其是当一个项目长期由 AI 辅助编写时，这种倾向会愈发严重。
-
-因此本 Skill 采用了一种偏"约束型"的规范风格：大部分规则是在告诉 AI"什么不要做"，而非"要做成什么样"。不要创建只有一个实现的抽象层、不要写 helper、不要为了 DRY 而 DRY、不要传裸函数代替接口——这些否定式约束的目的不是限制创造力，而是防止 AI 自动地、无意识地去执行那些它从训练数据中学到的"看起来更工程化"但实际上对当前项目无益的模式。
-
-同时，我也特别注意到了 AI 容易产生的一种"注释腐烂"现象：代码修改后注释落后于实现，导致后来阅读的人被错误注释误导。因此规范中特别强调了注释同步更新的硬性要求，并将其列为每次提交前必须执行的检查项——我认为这个问题的重要性足以用粗体和感叹号标注。
 
 ---
 
