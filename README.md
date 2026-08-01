@@ -113,6 +113,8 @@ qzero-code-style/
 | #18 | 用接口替代函数传递 | 不传裸函数/回调，定义职责清晰、注释完备的接口 |
 | #19 | 接口命名以 I 开头 | Kotlin/Java 接口必须以大写 I 开头（如 ISkillMetaInfoProvider） |
 | #20 | 禁止魔法字符串/数字 | 可枚举量必须用 enum，传输边界用常量+注释做转换 |
+| #21 | 测试用例命名使用英文 | SpringBoot 测试函数名/用例名必须英文，禁止中文 |
+| #22 | 代码注释使用中文 | 所有注释必须用中文编写 |
 
 ### Git 提交规范 (GIT_STYLE.md)
 
@@ -129,7 +131,7 @@ qzero-code-style/
 qzero-code-style/
 ├── SKILL.md        # Skill 定义文件（规范引用 + 经验积累流程）
 ├── CLAUDE.md       # 项目级指令
-├── CODE_STYLE.md   # 代码风格规范（20 条规则）
+├── CODE_STYLE.md   # 代码风格规范（22 条规则）
 ├── GIT_STYLE.md    # Git 提交规范
 ├── README.md       # 本说明文档
 └── LICENSE         # MIT 许可证

@@ -407,3 +407,69 @@ fun process(order: Order) {
     } // 编译器会检查 when 是否覆盖了所有枚举值
 }
 ```
+
+---
+
+# 21. SpringBoot 测试用例命名使用英文
+
+在 SpringBoot 项目中编写测试用例时，函数名和测试用例名（`@Test` 方法名、`@DisplayName` 注解值、`@ParameterizedTest` 的参数名等）**必须使用英文命名**，禁止使用中文。
+
+英文命名可以让测试函数名与生产代码保持一致的命名风格，避免中英文混杂导致的编码问题（如部分工具链对非 ASCII 标识符支持不完善），同时便于国际化团队协作。
+
+### Bad（中文命名）
+
+```java
+@Test
+@DisplayName("测试创建订单接口在库存不足时应该返回错误")
+void 测试创建订单_库存不足_返回错误() {
+    // ...
+}
+```
+
+### Good（英文命名）
+
+```java
+@Test
+@DisplayName("should return error when stock is insufficient for order creation")
+void shouldReturnError_whenStockInsufficient_forOrderCreation() {
+    // ...
+}
+```
+
+---
+
+# 22. 代码注释使用中文
+
+所有代码注释（包括函数头部注释、行内注释、TODO 注释等）**必须使用中文**编写。中文注释可以降低团队内部的理解门槛，让不熟悉英文的开发者也能快速理解代码意图。
+
+这条规则与第 21 条（测试命名用英文）并不矛盾：标识符（类名、函数名、变量名、测试用例名）是代码的一部分，必须能被编译器处理，保持英文命名以保证兼容性；而注释是给人读的，使用中文可以提高沟通效率。
+
+### Bad（英文注释）
+
+```java
+/**
+ * Processes the order and updates inventory.
+ * Returns the updated order status.
+ */
+public OrderStatus processOrder(Order order) {
+    // Check if inventory is sufficient
+    if (inventory.getStock(order.getProductId()) < order.getQuantity()) {
+        throw new InsufficientStockException();
+    }
+}
+```
+
+### Good（中文注释）
+
+```java
+/**
+ * 处理订单并更新库存。
+ * 返回更新后的订单状态。
+ */
+public OrderStatus processOrder(Order order) {
+    // 检查库存是否充足
+    if (inventory.getStock(order.getProductId()) < order.getQuantity()) {
+        throw new InsufficientStockException();
+    }
+}
+```
