@@ -473,3 +473,56 @@ public OrderStatus processOrder(Order order) {
     }
 }
 ```
+
+---
+
+# 23. 测试钩子必须加 @VisibleForTesting 注解
+
+在 Java/Kotlin 业务代码中，如果出于测试目的需要提升方法或字段的可见性（例如将 `private` 改为 `package-private` 或 `protected`），或者新增仅用于测试的访问方法，**必须**在声明处添加 `@VisibleForTesting` 注解。该注解明确标记了"这个方法/字段不是业务接口的一部分，仅为了测试而暴露"，避免后续维护者误将其当作正常的业务 API 来调用或扩展。
+
+此注解来源于 Google Guava 库（`com.google.common.annotations.VisibleForTesting`），Android 项目中也可使用 `androidx.annotation.VisibleForTesting`。
+
+### Bad（无注解标记）
+
+```kotlin
+// 原为 private，为了测试改为 internal，但没有任何标记说明原因
+internal fun calculateDiscount(price: BigDecimal): BigDecimal {
+    // ...
+}
+```
+
+```java
+// 新增一个仅用于测试的访问方法，但没有注解
+boolean isRetryable() {
+    return this.retryCount < MAX_RETRY;
+}
+```
+
+### Good（添加 @VisibleForTesting 注解）
+
+```kotlin
+import com.google.common.annotations.VisibleForTesting
+
+@VisibleForTesting
+internal fun calculateDiscount(price: BigDecimal): BigDecimal {
+    // ...
+}
+```
+
+```java
+import com.google.common.annotations.VisibleForTesting;
+
+@VisibleForTesting
+boolean isRetryable() {
+    return this.retryCount < MAX_RETRY;
+}
+```
+
+该注解的习惯用法还包括：如果方法仅因为测试而改为非 private，可以在注解中说明本来的意图：
+
+```kotlin
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal fun calculateDiscount(price: BigDecimal): BigDecimal {
+    // ...
+}
+```
