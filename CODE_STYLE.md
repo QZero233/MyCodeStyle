@@ -526,3 +526,147 @@ internal fun calculateDiscount(price: BigDecimal): BigDecimal {
     // ...
 }
 ```
+
+# 21. 注释禁止描述变更历史
+
+注释只能诚实描述当前代码在做什么（为什么、前置条件、特殊约束），禁止描述变更历史——不能写"已迁移至 X"、"原 Y 迁移至此"、"历史上…现已拆分…"、"以前干了什么"、"现在哪些事情不干了"等。
+
+后续读者看不到变更前的代码，这类变更描述对他们起不到任何辅助作用，反而让人困惑（代码已移除，注释却在描述被移除的逻辑），还会因后续再次变更而过时失真。变更历史交给 git 承担，注释不重复。
+
+### Bad（迁移后残留的变更描述）
+
+```cpp
+  AdjustFold(ui);
+
+  // XX 配置的控制已迁移至 ApplyConfig（Render 第三步），
+  // 作用于缓存，见 XxxAssembler::ApplyConfig。
+  return final_ret;
+```
+
+```cpp
+  // 填充 XX 配置（原 BuildContent 末尾逻辑迁移至此）
+  FillConfig(lang, data.scene(), ui);
+```
+
+### Good
+
+```cpp
+  AdjustFold(ui);
+
+  return final_ret;
+```
+
+```cpp
+  FillConfig(lang, data.scene(), ui);
+```
+
+### Bad（函数作用变更后，注释描述变更而非当前职责）
+
+```cpp
+/**
+ * @brief 组装结果
+ * 历史上本函数同时做校验与组装，现已拆分，校验移至 ResultValidator。
+ */
+void AssembleResult(...);
+```
+
+### Good
+
+```cpp
+/**
+ * @brief 组装结果
+ */
+void AssembleResult(...);
+```
+
+---
+
+# 22. 函数名必须与其实际契约一致——动作型名字不得内含"是否执行"的判断
+
+函数名是无声的契约。以动作动词命名的函数（`HideX` / `RemoveX` / `SendX`）承诺"调用它就执行该动作"。不要把"是否要做"的判断塞进这类函数内部——一旦它变成条件 no-op，名字就在撒谎：调用处看到 `HideX(...)` 会以为隐藏一定发生，实际可能什么都没做。
+
+两种修法：
+
+1. **（推荐）判断上移到调用方，函数只保留纯执行**。名字不变即诚实，且判断与执行分离，职责更清晰。
+2. **（次选）若判断必须留在函数内，把条件性写进名字**：`…IfNeeded` / `Maybe…`。可行，但"是否做"和"怎么做"仍揉在一起，仅在无法上移判断时使用。
+
+### Bad（名字承诺动作，内部却判断、可能 no-op）
+
+```cpp
+// 名字承诺"执行隐藏"，实际却先读配置判断、可能什么都不做
+void HideBanner(const std::string& scene, Ui& ui) {
+  const auto& cfg = GetConfig(scene);
+  const bool show = cfg.has_show_banner() ? cfg.show_banner() : true;
+  if (show) {
+    return;  // 名字叫 Hide，这里却不动手
+  }
+  // ... 真正的移除逻辑
+}
+
+// 调用方
+HideBanner(data.scene(), ui);
+```
+
+### Good（推荐：判断上移，函数只执行）
+
+```cpp
+void ApplyConfig(...) {
+  // ...
+  const bool show = cfg.has_show_banner() ? cfg.show_banner() : true;
+  if (!show) {
+    HideBanner(ui);  // 调用它就一定执行隐藏
+  }
+}
+
+// 只执行移除，不做判断——名字与行为一致
+void HideBanner(Ui& ui) {
+  // ... 真正的移除逻辑
+}
+```
+
+### Good（次选：名字显式表达条件性）
+
+```cpp
+// 若判断必须留在函数内，名字要带上条件语义
+void HideBannerIfNeeded(const std::string& scene, Ui& ui);
+void MaybeHideBanner(const std::string& scene, Ui& ui);
+```
+
+---
+
+# 23. guard 之后只跟单个高内聚动作时，不要用 early return 截断控制流
+
+规则 #6 推荐优先 early return，但有适用边界：early return 的价值在于 guard 之后还有**一长串代码**时压平嵌套。当 guard 之后只跟**一个高内聚动作**时，early return 反而有害——应该把动作收进 `if (!cond) { … }` 分支。
+
+为什么此时 early return 不好：
+
+- 动作孤零零落在 `return` 之后，读者要回头确认它属于"不 return"的分支，控制流隐晦。
+- 更危险的是：后续若在动作之后追加**必须执行**的步骤，会被 guard 的 `return` 意外跳过，且不易察觉。
+
+判断标准：guard 后是一长串流程 → early return；guard 后是单个内聚动作 → 收进 if 分支。
+
+### Bad（单个内聚动作用 early return 截断）
+
+```cpp
+void ApplyConfig(...) {
+  FillHeader(lang, data.scene(), ui);
+  // ... 读配置得 show_banner
+  if (show_banner) {
+    return;            // 截断
+  }
+  HideBanner(ui);   // 孤零零落在 return 之后
+}
+```
+
+### Good（内聚动作收进 if 分支）
+
+```cpp
+void ApplyConfig(...) {
+  FillHeader(lang, data.scene(), ui);
+  // ... 读配置得 show_banner
+  if (!show_banner) {
+    HideBanner(ui);   // 内聚动作收进分支，意图局部且显式
+  }
+}
+```
+
