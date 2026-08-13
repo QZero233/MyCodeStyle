@@ -670,3 +670,59 @@ void ApplyConfig(...) {
 }
 ```
 
+---
+
+# 27. 常量的引用规范：注释用常量名代指，测试断言独立声明常量
+
+## 注释中引用常量名，不写常量值
+
+在注释中需要提及某个常量时，用**常量名**代指，而不是直接写出常量的值。这样当常量的值发生变化时，注释无需同步修改，避免"改了常量却忘了改注释"导致注释与代码不一致（参见第 17 条）。
+
+### Bad（注释写死常量值）
+
+```kotlin
+private const val MAX_RETRY_COUNT = 3
+
+// 重试次数达到 3 次后停止
+if (retryCount >= MAX_RETRY_COUNT) {
+    stop()
+}
+```
+
+### Good（注释引用常量名）
+
+```kotlin
+private const val MAX_RETRY_COUNT = 3
+
+// 重试次数达到 MAX_RETRY_COUNT 后停止
+if (retryCount >= MAX_RETRY_COUNT) {
+    stop()
+}
+```
+
+## 测试断言中的常量必须独立声明
+
+在测试用例里，参与 `assert` 断言的常量既不能直接复用业务代码中的常量，也不能硬编码字面值，而应该在测试用例内单独新建一个常量。
+
+- 直接复用业务常量会让断言与实现耦合：业务常量一旦被错误修改，测试用的还是同一个常量，断言依然"通过"，暴露不出问题。
+- 硬编码字面值则是魔法数字：含义不清，同一期望值在多处断言重复出现时也难以维护。
+
+### Bad（复用业务常量 / 硬编码字面值）
+
+```kotlin
+// 直接复用业务代码常量
+assertEquals(OrderService.MAX_ORDER_COUNT, result.orderCount)
+
+// 直接硬编码字面值
+assertEquals(10, result.orderCount)
+```
+
+### Good（测试用例内独立声明常量）
+
+```kotlin
+// 在测试用例内独立声明期望常量，与业务常量解耦
+private const val EXPECTED_MAX_ORDER_COUNT = 10
+
+assertEquals(EXPECTED_MAX_ORDER_COUNT, result.orderCount)
+```
+

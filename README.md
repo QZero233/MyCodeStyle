@@ -119,6 +119,7 @@ qzero-code-style/
 | #24 | 注释禁止描述变更历史 | 注释只描述当前行为，变更历史由 git 承担 |
 | #25 | 函数名必须与契约一致 | 动作型名字不得内含"是否执行"的判断，判断应上移到调用方 |
 | #26 | guard 后单动作不用 early return | 当 guard 之后只跟单个高内聚动作时，收进 if 分支而非 return 截断 |
+| #27 | 常量的引用规范 | 注释用常量名代指而非写值；测试断言常量须在测试内独立声明 |
 
 ### Git 提交规范 (GIT_STYLE.md)
 
@@ -135,7 +136,7 @@ qzero-code-style/
 qzero-code-style/
 ├── SKILL.md        # Skill 定义文件（规范引用 + 经验积累流程）
 ├── CLAUDE.md       # 项目级指令
-├── CODE_STYLE.md   # 代码风格规范（26 条规则）
+├── CODE_STYLE.md   # 代码风格规范（27 条规则）
 ├── GIT_STYLE.md    # Git 提交规范
 ├── README.md       # 本说明文档
 └── LICENSE         # MIT 许可证
