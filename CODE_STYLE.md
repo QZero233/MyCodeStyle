@@ -726,3 +726,47 @@ private const val EXPECTED_MAX_ORDER_COUNT = 10
 assertEquals(EXPECTED_MAX_ORDER_COUNT, result.orderCount)
 ```
 
+---
+
+# 28. 单调用方的函数与常量收敛为局部函数/局部变量
+
+新增一段逻辑时，如果它只被**一个**函数使用，不要写成类级 `private fun`，也不要往 `companion object` 加常量，而应直接在唯一调用方的函数体内定义**局部函数**和**局部变量**，把作用域压到最小。局部函数同样要在定义前写好完整注释（作用、调用规约、返回值、副作用）。
+
+这条规则是第 1 条（只解决当前问题）和第 14 条（删除没有隐藏复杂性的层）在作用域维度的延伸：类成员是类的公共资产，只为一个调用方服务的逻辑混在类成员里，会无谓扩大读者的搜索范围，也让类的对外表面持续膨胀。只有当第二个调用方真实出现时，再提升为类级私有函数不迟。
+
+### Bad（唯一调用方的函数写成类成员）
+
+```kotlin
+class OrderService {
+    fun submitOrder(order: Order): Receipt {
+        val tax = calculateTax(order)
+        // ... 其他业务逻辑
+    }
+
+    // 只被 submitOrder 调用，却暴露为类成员
+    private fun calculateTax(order: Order): Long { ... }
+    private fun extractField(source: String, key: String): String? { ... }
+
+    companion object {
+        private const val FIELD_TAX_RATE = "tax_rate"
+    }
+}
+```
+
+### Good（收敛为调用方内部的局部函数与局部变量）
+
+```kotlin
+class OrderService {
+    fun submitOrder(order: Order): Receipt {
+        // 局部常量 + 局部函数，作用域限制在唯一调用方内部
+        val fieldTaxRate = "tax_rate"
+
+        fun extractField(source: String, key: String): String? { ... }
+        fun calculateTax(order: Order): Long { ... }
+
+        val tax = calculateTax(order)
+        // ... 其他业务逻辑
+    }
+}
+```
+
